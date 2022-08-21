@@ -1,8 +1,8 @@
 #include<immintrin.h>
 #include<stdio.h>
 
-void print_bytes(void *ptr, int size) 
-{
+//helper function (not needed)
+void print_bytes(void *ptr, int size){
     unsigned char *p = ptr;
     int i;
     for (i=0; i<size; i++) {
@@ -14,31 +14,33 @@ void print_bytes(void *ptr, int size)
 unsigned long custom_strlen(char* arr){
 	
 	unsigned long len = 0;
+	int clen = 0;
 
-	__m256i mask = _mm256_setr_epi32(-1, -1, -1, -1, -1, -1, -1, -1);
+	__m256i mask, vec, EOS, cmp;
 
-	__m256i vec = _mm256_maskload_epi32((int const*)arr, mask);
+	mask = _mm256_set1_epi32(-1);
+	EOS = _mm256_set1_epi8('\0');
 
-	__m256i EOS = _mm256_set1_epi8('\0');
+	do{
 
-	__m256i cmp = _mm256_cmpeq_epi8(vec, EOS);
+		vec = _mm256_maskload_epi32((int const*)(arr+len), mask);
+		cmp = _mm256_cmpeq_epi8(vec, EOS);
+		clen = _mm256_movemask_epi8(cmp);
 
-	len = _tzcnt_u32(_mm256_movemask_epi8(cmp));
+	}while(clen == 0 && (len+=32));
 
-	// char* res = (char*) &cmp;
+	len += _tzcnt_u32(clen);
 	// print_bytes((void *) &cmp, 32);
-	// printf("%d\n", _tzcnt_u32(len));
+	// printf("%d\n", len);
 
 	return len;
 }
 
 int main(int agc, char* argv[]){
 	
-	int arr16[16] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
-	int arr5[5] = {0, 1, 2, 3, 4};
-
-	char str[] = "nalin wadhwa";
-	char str1[] = "is this working or not?";
+	//testing the function :D
+	char str[] = "ttttttttttttttttttttthhhhhhhhhhhhhhhhhhhhhhhhhhhhiiiiiiiiiiiiiiiiiiiiiiisssssssssssssssssssss iiiiiiiissssssssssss llllllllloooooooooooonnnnnnnnnggggggggggg :)";
+	char str1[] = "is this working or not?          ";
 	char str2[] = "woah this works !!! :)";
 	char str3[] = "";
 	char str4[] = "f";
