@@ -46,12 +46,12 @@ int main(int agc, char* argv[]){
 	char str6[] = "fff";
 
 	printf("'%s' %lu\n", str, custom_strlen(str));
-	custom_strlen(str1);
-	custom_strlen(str2);
-	custom_strlen(str3);
-	custom_strlen(str4);
-	custom_strlen(str5);
-	custom_strlen(str6);
+	printf("'%s' %lu\n", str1, custom_strlen(str1));
+	printf("'%s' %lu\n", str2, custom_strlen(str2));
+	printf("'%s' %lu\n", str3, custom_strlen(str3));
+	printf("'%s' %lu\n", str4, custom_strlen(str4));
+	printf("'%s' %lu\n", str5, custom_strlen(str5));
+	printf("'%s' %lu\n", str6, custom_strlen(str6));
 
 
 	return 0;
