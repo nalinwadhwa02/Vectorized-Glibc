@@ -1,12 +1,12 @@
 CC = clang
 CFLAGS = -g -O2 -mavx2 -mlzcnt
-DEPS = 
-OBJ = strlen.o
 
-%.o: %.c ${DEPS}
-	${CC} ${CFLAGS} -c -o $@ $<
+TARGET = testing
 
-strlen: ${OBJ} 
-	${CC} ${CFLAGS} -o $@.out $^
+all = $(TARGET)
 
+$(TARGET): $(TARGET).c
+	$(CC) $(CFLAGS) -o $(TARGET).out $(TARGET).c
 
+clean:
+	rm -rf *.out
