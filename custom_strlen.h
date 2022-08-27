@@ -3,7 +3,7 @@
 #include<stdio.h>
 #include<string.h>
 
-//helper function (not needed)
+/*helper function (not needed)
 void print_bytes(void *ptr, int size){
     unsigned char *p = ptr;
     int i;
@@ -12,6 +12,7 @@ void print_bytes(void *ptr, int size){
     }
     printf("\n");
 }
+*/
 
 unsigned long custom_strlen(char* arr){
 	

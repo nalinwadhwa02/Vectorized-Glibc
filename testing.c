@@ -10,9 +10,9 @@ int measure_time(FILE* ptr){
 
 	clock_t t;
 	double time_taken_ms_a, time_taken_ms_b;
-	unsigned long len;
+	unsigned long lena, lenb;
 
-	for(unsigned long slen = 1000 ; slen < 100000000000 ; slen *= 10){
+	for(unsigned long slen = 10000 ; slen < 5000000000 ; slen *= 2){
 
 		//generate input
 		char *str = (char*) malloc (slen * sizeof(char));
@@ -22,22 +22,20 @@ int measure_time(FILE* ptr){
 
 		//glibc function
 		t = clock();
-		len = strlen(str);
+		lena = strlen(str);
 		t = clock() - t;
 		time_taken_ms_a = ((double)t)*1000/CLOCKS_PER_SEC;
-		printf("len: %lu\n", len);
-		assert(len == slen);
+		//assert(len == slen);
 
 
 		//custom function
 		t = clock();
-		len = custom_strlen(str);
+		lenb = custom_strlen(str);
 		t = clock() - t;
-		time_taken_ms_a = ((double)t)*1000/CLOCKS_PER_SEC;
-		printf("len: %lu\n", len);
-		assert(len == slen);
+		time_taken_ms_b = ((double)t)*1000/CLOCKS_PER_SEC;
+		//assert(len == slen);
 		
-		printf("slen: %lu, %f, %f\n", slen, time_taken_ms_a, time_taken_ms_b);
+		printf("lena:%lu lenb:%lu slen: %lu, %f, %f\n",lena, lenb, slen, time_taken_ms_a, time_taken_ms_b);
 		fprintf(ptr, "%lu, %f, %f\n", slen, time_taken_ms_a, time_taken_ms_b);
 	}
 
