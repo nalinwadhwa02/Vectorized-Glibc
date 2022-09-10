@@ -2,15 +2,22 @@
 #include<time.h>
 #include<stdlib.h>
 #include<assert.h>
-#include "custom_strlen.h"
+#include<string.h>
+#include "code_block.h"
+
+unsigned long custom_strlen(char * c){
+	unsigned long len = 0;
+	while(c[len++]){}
+	return len;
+}
 
 int measure_time(FILE* ptr){
 
-	fprintf(ptr, "slen, glibc implementation, custom implementation\n");
+	fprintf(ptr, "slen, glibc implementation, custom implementation, linear implementation\n");
 
 	clock_t t;
-	double time_taken_ms_a, time_taken_ms_b;
-	unsigned long lena, lenb;
+	double time_taken_ms_a, time_taken_ms_b, time_taken_ms_c;
+	unsigned long lena, lenb, lenc;
 
 	for(unsigned long slen = 10000 ; slen < 5000000000 ; slen *= 2){
 
@@ -30,13 +37,20 @@ int measure_time(FILE* ptr){
 
 		//custom function
 		t = clock();
-		lenb = custom_strlen(str);
+		lenb = check_character_location(str, '\0');
 		t = clock() - t;
 		time_taken_ms_b = ((double)t)*1000/CLOCKS_PER_SEC;
 		//assert(len == slen);
+
+		//linear function
+		t = clock();
+		lenc = custom_strlen(str);
+		t = clock() - t;
+		time_taken_ms_c = ((double)t)*1000/CLOCKS_PER_SEC;
+
 		
-		printf("lena:%lu lenb:%lu slen: %lu, %f, %f\n",lena, lenb, slen, time_taken_ms_a, time_taken_ms_b);
-		fprintf(ptr, "%lu, %f, %f\n", slen, time_taken_ms_a, time_taken_ms_b);
+		printf("lena:%lu lenb:%lu lenc:%lu slen: %lu, %f, %f, %f\n",lena, lenb, lenc, slen, time_taken_ms_a, time_taken_ms_b, time_taken_ms_c);
+		fprintf(ptr, "%lu, %f, %f, %f\n", slen, time_taken_ms_a, time_taken_ms_b, time_taken_ms_c);
 	}
 
 	return 0;

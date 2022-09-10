@@ -1,5 +1,5 @@
 CC = clang
-CFLAGS = -g -mavx2 -mlzcnt
+CFLAGS = -g -mavx2 -mlzcnt -O2
 
 TARGET = testing
 
