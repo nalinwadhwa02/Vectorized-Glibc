@@ -4,12 +4,12 @@
 #include<assert.h>
 #include<string.h>
 #include<stdbool.h>
-#include "string_cmp.h"
+#include "../string_cmp.h"
 
-bool basic_strcmp(char* a, char* b){
+int basic_strcmp(char* a, char* b){
     int len = 0;
-    while(a[len] == b[len] && a[len] != '\0' && (len++)) {}
-    return ((a[len] != '\0')? false : true );
+    while((a[len] == b[len] && a[len] != '\0') && (len+=1)) {}
+    return ((a[len] != '\0')? ((a[len] > b[len]) * 2) - 1 : 0);
 }
 
 int measure_time(FILE* ptr){
@@ -25,8 +25,8 @@ int measure_time(FILE* ptr){
 		//generate input
 		char *str1 = (char*) malloc (slen * sizeof(char));
 		char *str2 = (char*) malloc (slen * sizeof(char));
-		memset(str1, 'a' , slen * sizeof(char));
-        memset(str2, 'a' , slen * sizeof(char));
+		memset(str1, 'b' , slen * sizeof(char));
+        memset(str2, 'b' , slen * sizeof(char));
 
 		//measure a and b
 
@@ -35,7 +35,6 @@ int measure_time(FILE* ptr){
 		lena = strcmp(str1, str2);
 		t = clock() - t;
 		time_taken_ms_a = ((double)t)*1000/CLOCKS_PER_SEC;
-		//assert(len == slen);
 
 
 		//custom function
@@ -43,7 +42,6 @@ int measure_time(FILE* ptr){
 		lenb = string_cmp(str1, str2);
 		t = clock() - t;
 		time_taken_ms_b = ((double)t)*1000/CLOCKS_PER_SEC;
-		//assert(len == slen);
 
 		//linear function
 		t = clock();
@@ -74,12 +72,12 @@ int main(int argc, char* argv[]){
 		return -1;
 	}
 
-	// char* str1 = "hello____________________________________________________________________________";
-	// char* str2 = "hello____________________________________________________________________________";
-	// char* str3 = "hello_________________________________________________________________________";
+	char* str1 = "ielloabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz";
+	char* str2 = "hellowello";
+	char* str3 = "hellowellp";
 
-	// printf("%i\n", string_cmp(str1, str3));
-	// printf(string_cmp(str1, str3));
+	// printf("result: %i\n", string_cmp(str2, str3));
+	// printf("result: %i\n", string_cmp(str1, str3));
 
 
 	printf("Starting benchmarking\n");

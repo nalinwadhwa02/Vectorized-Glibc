@@ -66,7 +66,7 @@ int main(int argc, char* argv[]){
 	FILE* ptr;
 	ptr = fopen(argv[1], "w");
 
-	if(NULL == ptr){
+	if(ptr == NULL){
 		printf("ERROR: result file '%s' can't be opened\n", argv[1]);
 		return -1;
 	}
