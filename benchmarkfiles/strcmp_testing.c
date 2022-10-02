@@ -50,6 +50,8 @@ int measure_time(FILE* ptr){
 		time_taken_ms_c = ((double)t)*1000/CLOCKS_PER_SEC;
 
 		
+		free(str1);
+		free(str2);
 		printf("lena:%i lenb:%i lenc:%i slen: %lu, %f, %f, %f\n",lena, lenb, lenc, slen, time_taken_ms_a, time_taken_ms_b, time_taken_ms_c);
 		fprintf(ptr, "%lu, %f, %f, %f\n", slen, time_taken_ms_a, time_taken_ms_b, time_taken_ms_c);
 	}

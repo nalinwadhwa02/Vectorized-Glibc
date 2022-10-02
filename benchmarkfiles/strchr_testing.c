@@ -3,33 +3,37 @@
 #include<stdlib.h>
 #include<assert.h>
 #include<string.h>
-#include "../check_character_location.h"
+#include "check_character_location.h"
 
-unsigned long basic_strlen(char * c){
-	unsigned long len = 0;
-	while(c[len++]){}
-	return len;
-}
+// unsigned long basic_strlen(char * c){
+// 	unsigned long len = 0;
+// 	while(c[len++]){}
+// 	return len;
+// }
 
 int measure_time(FILE* ptr){
 
 	fprintf(ptr, "slen, glibc implementation, custom implementation, linear implementation\n");
 
+	srand(time(NULL));
 	clock_t t;
 	double time_taken_ms_a, time_taken_ms_b, time_taken_ms_c;
-	unsigned long lena, lenb, lenc;
+	unsigned long lena, lenb, lenc, slen = 5000000000;
+	char *str = (char*) malloc (slen * sizeof(char));
+	memset(str, 'a' , slen * sizeof(char));
 
-	for(unsigned long slen = 10000 ; slen < 5000000000 ; slen *= 2){
+	for(unsigned long s = 0; s < 30; s ++){
 
 		//generate input
-		char *str = (char*) malloc (slen * sizeof(char));
 		memset(str, 'a' , slen * sizeof(char));
+		unsigned long rnd = rand() % slen;
+		str[rnd] = 'b';
 
 		//measure a and b
 
 		//glibc function
 		t = clock();
-		lena = strlen(str);
+		lena = (str - strchr(str, 'b') + 0);
 		t = clock() - t;
 		time_taken_ms_a = ((double)t)*1000/CLOCKS_PER_SEC;
 		//assert(len == slen);
@@ -37,20 +41,20 @@ int measure_time(FILE* ptr){
 
 		//custom function
 		t = clock();
-		lenb = check_character_location(str, '\0');
+		lenb = check_character_location(str, 'b'); 
 		t = clock() - t;
 		time_taken_ms_b = ((double)t)*1000/CLOCKS_PER_SEC;
 		//assert(len == slen);
 
 		//linear function
 		t = clock();
-		lenc = basic_strlen(str);
+		// lenc = basic_strlen(str);
 		t = clock() - t;
 		time_taken_ms_c = ((double)t)*1000/CLOCKS_PER_SEC;
 
 		
-		printf("lena:%lu lenb:%lu lenc:%lu slen: %lu, %f, %f, %f\n",lena, lenb, lenc, slen, time_taken_ms_a, time_taken_ms_b, time_taken_ms_c);
-		fprintf(ptr, "%lu, %f, %f, %f\n", slen, time_taken_ms_a, time_taken_ms_b, time_taken_ms_c);
+		printf("lena:%lu lenb:%lu lenc:%lu slen: %lu, %f, %f, %f\n",lena, lenb, lenc, rnd, time_taken_ms_a, time_taken_ms_b, time_taken_ms_c);
+		fprintf(ptr, "%lu, %f, %f, %f\n", rnd, time_taken_ms_a, time_taken_ms_b, time_taken_ms_c);
 	}
 
 	return 0;
