@@ -4,7 +4,7 @@
 #include<assert.h>
 #include<string.h>
 #include<stdbool.h>
-#include "../string_cmp.h"
+#include "string_cmp.h"
 
 int basic_strcmp(char* a, char* b){
     int len = 0;
@@ -20,13 +20,14 @@ int measure_time(FILE* ptr){
 	double time_taken_ms_a, time_taken_ms_b, time_taken_ms_c;
 	bool lena, lenb, lenc;
 
-	for(unsigned long slen = 10000 ; slen < 2500000000 ; slen *= 2){
+	for(unsigned long slen = 10000 ; slen < 5000000001 ; slen *= 2){
 
 		//generate input
-		char *str1 = (char*) malloc (slen * sizeof(char));
-		char *str2 = (char*) malloc (slen * sizeof(char));
+		char *str1 = (char*) malloc ((slen+1) * sizeof(char));
+		char *str2 = (char*) malloc ((slen+1) * sizeof(char));
 		memset(str1, 'b' , slen * sizeof(char));
         memset(str2, 'b' , slen * sizeof(char));
+		str1[slen] = str2[slen] = '\0';
 
 		//measure a and b
 
