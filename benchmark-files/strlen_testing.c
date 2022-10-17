@@ -3,8 +3,8 @@
 #include<stdlib.h>
 #include<assert.h>
 #include<string.h>
-#include "check_character_location.h"
-#include "compiler-optimized/strlen.h"
+// #include "../custom-codeblocks/check_character_location.h"
+// #include "../compiler-optimized/strlen.h"
 
 unsigned long basic_strlen(char * c){
 	unsigned long len = 0;
