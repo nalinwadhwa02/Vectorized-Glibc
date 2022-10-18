@@ -1,8 +1,8 @@
 CC = clang
 
 CUSTOMCODEBLOCKS_FLAGS = -mavx2 -mlzcnt -O3
-COMPILEROPTIMIZED_FLAGS = -O3
-BENCHMARK_FLAGS = -g
+COMPILEROPTIMIZED_FLAGS = -O3 -mavx2
+BENCHMARK_FLAGS = -g -mavx2
 
 BENCHMARKFILES_DIR ?= benchmark-files
 CUSTOMBUILDS_DIR ?= builds/custom
@@ -33,5 +33,6 @@ $(OBJ_DIR)/%.out : $(BENCHMARKFILES_DIR)/%.c
 	$(CC) $(BENCHMARK_FLAGS) $(wildcard $(BUILDS_DIR)/*.o) $< -o $@
 
 clean:
-	rm -rf $(BUILDS_DIR)/*.out
+	rm -rf $(CUSTOMBUILDS_DIR)/*.o
+	rm -rf $(COMPILERBUILDS_DIR)/*.o
 	rm -rf $(OBJ_DIR)/*.out

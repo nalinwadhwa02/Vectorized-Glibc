@@ -3,13 +3,12 @@
 #include<stdlib.h>
 #include<assert.h>
 #include<string.h>
-#include "../custom-codeblocks/check_character_location.h"
-#include "../compiler-optimized/strlen.h"
+#include "check_character_location.h"
 
 unsigned long basic_strlen(char * c){
 	unsigned long len = 0;
 	while(c[len++]){}
-	return len;
+	return len-1;
 }
 
 int measure_time(FILE* ptr){
@@ -20,7 +19,7 @@ int measure_time(FILE* ptr){
 	double time_taken_ms_a, time_taken_ms_b, time_taken_ms_c;
 	unsigned long lena, lenb, lenc;
 
-	for(unsigned long slen = 10000 ; slen < 5000000000 ; slen *= 2){
+	for(unsigned long slen = 10000 ; slen < 10000000000 ; slen *= 2){
 
 		//generate input
 		char *str = (char*) malloc (slen * sizeof(char));
@@ -33,7 +32,7 @@ int measure_time(FILE* ptr){
 		lena = strlen(str);
 		t = clock() - t;
 		time_taken_ms_a = ((double)t)*1000/CLOCKS_PER_SEC;
-		//assert(len == slen);
+		// assert(lena == slen);
 
 
 		//custom function
@@ -41,13 +40,14 @@ int measure_time(FILE* ptr){
 		lenb = check_character_location(str, '\0');
 		t = clock() - t;
 		time_taken_ms_b = ((double)t)*1000/CLOCKS_PER_SEC;
-		//assert(len == slen);
+		// assert(lenb == slen);
 
 		//linear function
 		t = clock();
-		lenc = co_strlen(str);
+		lenc = basic_strlen(str);
 		t = clock() - t;
 		time_taken_ms_c = ((double)t)*1000/CLOCKS_PER_SEC;
+		// assert(lenc == slen);
 
 		free(str);
 		
