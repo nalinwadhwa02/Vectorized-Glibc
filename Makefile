@@ -1,38 +1,23 @@
 CC = clang
+CB_FLAGS = -mavx2 -mlzcnt -O3
+TEST_FLAGS = -g -mavx2 -v -O3 -mlzcnt
 
-CUSTOMCODEBLOCKS_FLAGS = -mavx2 -mlzcnt -O3
-COMPILEROPTIMIZED_FLAGS = -O3 -mavx2
-BENCHMARK_FLAGS = -g -mavx2
+CB_DIR ?= major-codeblocks
+BLD_DIR ?= bld
 
-BENCHMARKFILES_DIR ?= benchmark-files
-CUSTOMBUILDS_DIR ?= builds/custom
-COMPILERBUILDS_DIR ?= builds/compiler
-OBJ_DIR ?= objects
-CUSTOMCODEBLOCKS_DIR ?= custom-codeblocks
-COMPILEROPTIMIZEDBLOCKS_DIR ?= compiler-optimized
+CB_FILES := $(wildcard $(CB_DIR)/*.h)
+CB_BLDS := $(patsubst $(CB_DIR)/%.h, $(BLD_DIR)/%.o, $(CB_FILES))
 
-COMPILEROPTIMIZED_FILES := $(wildcard $(COMPILEROPTIMIZEDBLOCKS_DIR)/*.h)
+build: $(CB_BLDS)
 
-CUSTOMCODEBLOCKS_FILES := $(wildcard $(CUSTOMCODEBLOCKS_DIR)/*.h)
+$(BLD_DIR)/%.o : $(CB_DIR)/%.h
+	$(CC) $(CB_FLAGS) -c $< -o $@
 
-CUSTOMCODEBLOCKS_BUILDS := $(patsubst $(CUSTOMCODEBLOCKS_DIR)/%.h,$(CUSTOMBUILDS_DIR)/%.o,$(CUSTOMCODEBLOCKS_FILES))
-
-COMPILEROPTIMIZED_BUILDS := $(patsubst $(COMPILEROPTIMIZEDBLOCKS_DIR)/%.h,$(COMPILERBUILDS_DIR)/%.o,$(COMPILEROPTIMIZED_FILES))
-
-buildcustom: $(CUSTOMCODEBLOCKS_BUILDS)
-
-buildcompiler: $(COMPILEROPTIMIZED_BUILDS)
-
-$(CUSTOMBUILDS_DIR)/%.o : $(CUSTOMCODEBLOCKS_DIR)/%.h
-	$(CC) $(CUSTOMCODEBLOCKS_FLAGS) -c $< -o $@
-
-$(COMPILERBUILDS_DIR)/%.o : $(COMPILEROPTIMIZEDBLOCKS_DIR)/%.h
-	$(CC) $(COMPILEROPTIMIZED_FLAGS) -c $< -o $@
-
-$(OBJ_DIR)/%.out : $(BENCHMARKFILES_DIR)/%.c
-	$(CC) $(BENCHMARK_FLAGS) $(wildcard $(BUILDS_DIR)/*.o) $< -o $@
+test: testmain.c
+	$(CC) $(TEST_FLAGS) $(wildcard $(BLD_DIR)/*.o) $< -o test.out
 
 clean:
 	rm -rf $(CUSTOMBUILDS_DIR)/*.o
 	rm -rf $(COMPILERBUILDS_DIR)/*.o
 	rm -rf $(OBJ_DIR)/*.out
+
