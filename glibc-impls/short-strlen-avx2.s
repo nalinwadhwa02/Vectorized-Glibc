@@ -133,11 +133,11 @@ L(loop_4x_vec):
 	   where no matches in ymm1/ymm3 respectively there is no issue
 	   with overlap.  */
 	vmovdqa	1(%rdi), %ymm1
-	VPMINU	(VEC_SIZE + 1)(%rdi), %ymm1, %ymm2 // [rmnt]: ymm2=MIN(bytes 32-63, bytes 0-31). ymm2 has a 0 iff there is a 0 in the first 64 bytes
+	VPMINU	(VEC_SIZE + 1)(%rdi), %ymm1, %ymm2 // [rns]: ymm2=MIN(bytes 32-63, bytes 0-31). ymm2 has a 0 iff there is a 0 in the first 64 bytes
 	vmovdqa	(VEC_SIZE * 2 + 1)(%rdi), %ymm3
-	VPMINU	(VEC_SIZE * 3 + 1)(%rdi), %ymm3, %ymm4 // [rmnt]: ymm4=MIN(bytes 96-127, bytes 64-95). ymm4 has a 0 iff there is a 0 in bytes 65-127
+	VPMINU	(VEC_SIZE * 3 + 1)(%rdi), %ymm3, %ymm4 // [rns]: ymm4=MIN(bytes 96-127, bytes 64-95). ymm4 has a 0 iff there is a 0 in bytes 65-127
 
-	VPMINU	%ymm2, %ymm4, %ymm5 // [rmnt]: ymm5 has a 0 iff there is a 0 in bytes 0-127
+	VPMINU	%ymm2, %ymm4, %ymm5 // [rns]: ymm5 has a 0 iff there is a 0 in bytes 0-127
 	VPCMPEQ	%ymm5, %ymm0, %ymm5
 	vpmovmskb %ymm5, %ecx
 
@@ -163,8 +163,8 @@ L(loop_4x_vec):
 	/* rcx has combined result from all 4 VEC. It will only be used
 	   if the first 3 other VEC all did not contain a match.  */
 	salq	$32, %rcx
-	orq	%rcx, %rax // rax = [mask of ymm5 | mask of ymm3]
-	tzcntq	%rax, %rax // if you find a zero in ymm3's mask, then return that. otherwise, the zero in ymm5's mask must be from ymm4.
+	orq	%rcx, %rax // [rns]: rax = [mask of ymm5 | mask of ymm3]
+	tzcntq	%rax, %rax // [rns]: if you find a zero in ymm3's mask, then return that. otherwise, the zero in ymm5's mask must be from ymm4.
 	subq	$(VEC_SIZE * 2 - 1), %rdi
 	addq	%rdi, %rax
 	VZEROUPPER_RETURN
