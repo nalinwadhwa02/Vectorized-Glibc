@@ -55,12 +55,12 @@ ENTRY_P2ALIGN (STRCHR, 5)
 	vmovd	%esi, %xmm0
 	movl	%edi, %eax
 	andl	$(PAGE_SIZE - 1), %eax
-	VPBROADCAST	%xmm0, %ymm0
-	vpxor	%xmm1, %xmm1, %xmm1
+	VPBROADCAST	%xmm0, %ymm0//[!doubt]: if we wanted to broadcast to ymm0, why did we move to xmm0?
+	vpxor	%xmm1, %xmm1, %xmm1//![doubt]: why did we only set 0 to lower 128 bits (and not upper as well)
 
 	/* Check if we cross page boundary with one vector load.  */
 	cmpl	$(PAGE_SIZE - VEC_SIZE), %eax
-	ja	L(cross_page_boundary)
+	ja	L(cross_page_boundary)//![check]: possibility to make another codeblock for checking if crossed page boundary
 
 	/* Check the first VEC_SIZE bytes.	Search for both CHAR and the
 	   null byte.  */
@@ -74,15 +74,15 @@ ENTRY_P2ALIGN (STRCHR, 5)
 	tzcntl	%eax, %eax
 # ifndef USE_AS_STRCHRNUL
 	/* Found CHAR or the null byte.  */
-	cmp	(%rdi, %rax), %CHAR_REG
-	/* NB: Use a branch instead of cmovcc here. The expectation is
+	cmp	(%rdi, %rax), %CHAR_REG //check at rdi + rax if the position found is char or not
+	/* NB: Use a branch instead of cmovcc here. The expectation is //![doubt]
 	   that with strchr the user will branch based on input being
 	   null. Since this branch will be 100% predictive of the user
 	   branch a branch miss here should save what otherwise would
 	   be branch miss in the user code. Otherwise using a branch 1)
 	   saves code size and 2) is faster in highly predictable
 	   environments.  */
-	jne	L(zero)
+	jne	L(zero) // goto zero if we reached the nullbyte
 # endif
 	addq	%rdi, %rax
 L(return_vzeroupper):
