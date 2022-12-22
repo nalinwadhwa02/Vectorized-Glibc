@@ -1,2 +1,3 @@
 1. How specific should the codeblocks be? E.g., see codeblock 1. Should we parameterise it by registers?
 2. `glibc-impls/short-strlen-avx2.s`, line 144: Why use `subq	$-(VEC_SIZE * 4), %rdi` instead of `addq	$(VEC_SIZE * 4), %rdi`?
+3. Is making a codeblock that executes some combination of vector inst in 4 x 32 byte regs a good idea? (would it be too high level, even though strlen and strchr both have v similar algos)?

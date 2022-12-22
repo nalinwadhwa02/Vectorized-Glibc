@@ -57,7 +57,7 @@ Description: Cascadable version of the cmp-mem-reg-32 codeblock
 
 Code: 
 
-```asm
+```{asm}
 vpcmpeq %ymm0, %creg, %ymm1
 vpmovmskb %ymm1, %eax
 orl %eax, %ebx

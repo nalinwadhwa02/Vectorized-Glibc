@@ -202,7 +202,7 @@ L(loop_4x_vec):
 	vpxor	%ymm6, %ymm0, %ymm2
 	vpxor	%ymm7, %ymm0, %ymm3
 
-	VPMINU	%ymm2, %ymm6, %ymm2
+	VPMINU	%ymm2, %ymm6, %ymm2 //![doubt]: why are we using VPMINU (min command), and at other places using or/and
 	VPMINU	%ymm3, %ymm7, %ymm3
 
 	vmovdqa	(VEC_SIZE * 2 + 1)(%rdi), %ymm6

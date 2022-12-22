@@ -1,5 +1,6 @@
 - Codeblocks for:
   - return
   - zeroing registers
+  - cascadable comparision codeblocks
 - Changes in existing code blocks
   - make cmp-mem-reg-32 not specific to arguments (remove first args mem dependency)
