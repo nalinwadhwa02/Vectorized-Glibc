@@ -1,0 +1,3 @@
+- Codeblocks for:
+    - return
+    - zeroing registers

@@ -53,6 +53,8 @@ ENTRY (STRLEN)
 	/* Check if we may cross page boundary with one vector load.  */
 	cmpl	$(PAGE_SIZE - VEC_SIZE), %eax
 	ja	L(cross_page_boundary)
+	// [rmnt]:If the offset of the (char *) pointer within its page (which is stored in eax) is above (greater than)
+	// PAGE_SIZE-VEC_SIZE, then one vector load will cross the page boundary.
 
 	/* Check the first VEC_SIZE bytes.  */
 	VPCMPEQ	(%rdi), %ymm0, %ymm1
@@ -97,7 +99,7 @@ L(aligned_more):
 	/* Align data to VEC_SIZE - 1. This is the same number of
 	   instructions as using andq with -VEC_SIZE but saves 4 bytes of
 	   code on the x4 check.  */
-	orq	$(VEC_SIZE - 1), %rdi/*!doubt*/
+	orq	$(VEC_SIZE - 1), %rdi /*[rmnt]: Moving the pointer to the next boundary aligned to VEC_SIZE-1 so that subsequent loads are faster*/
 L(cross_page_continue):
 	/* Check the first 4 * VEC_SIZE.  Only one VEC_SIZE at a time
 	   since data is only aligned to VEC_SIZE.  */
@@ -131,15 +133,15 @@ L(loop_4x_vec):
 	   where no matches in ymm1/ymm3 respectively there is no issue
 	   with overlap.  */
 	vmovdqa	1(%rdi), %ymm1
-	VPMINU	(VEC_SIZE + 1)(%rdi), %ymm1, %ymm2
+	VPMINU	(VEC_SIZE + 1)(%rdi), %ymm1, %ymm2 // [rmnt]: ymm2=MIN(bytes 32-63, bytes 0-31). ymm2 has a 0 iff there is a 0 in the first 64 bytes
 	vmovdqa	(VEC_SIZE * 2 + 1)(%rdi), %ymm3
-	VPMINU	(VEC_SIZE * 3 + 1)(%rdi), %ymm3, %ymm4
+	VPMINU	(VEC_SIZE * 3 + 1)(%rdi), %ymm3, %ymm4 // [rmnt]: ymm4=MIN(bytes 96-127, bytes 64-95). ymm4 has a 0 iff there is a 0 in bytes 65-127
 
-	VPMINU	%ymm2, %ymm4, %ymm5
+	VPMINU	%ymm2, %ymm4, %ymm5 // [rmnt]: ymm5 has a 0 iff there is a 0 in bytes 0-127
 	VPCMPEQ	%ymm5, %ymm0, %ymm5
 	vpmovmskb %ymm5, %ecx
 
-	subq	$-(VEC_SIZE * 4), %rdi
+	subq	$-(VEC_SIZE * 4), %rdi // [doubt]: why subtract - VEC_SIZE*4 and not add VEC_SIZE*4?
 	testl	%ecx, %ecx
 	jz	L(loop_4x_vec)
 
@@ -161,8 +163,8 @@ L(loop_4x_vec):
 	/* rcx has combined result from all 4 VEC. It will only be used
 	   if the first 3 other VEC all did not contain a match.  */
 	salq	$32, %rcx
-	orq	%rcx, %rax
-	tzcntq	%rax, %rax
+	orq	%rcx, %rax // rax = [mask of ymm5 | mask of ymm3]
+	tzcntq	%rax, %rax // if you find a zero in ymm3's mask, then return that. otherwise, the zero in ymm5's mask must be from ymm4.
 	subq	$(VEC_SIZE * 2 - 1), %rdi
 	addq	%rdi, %rax
 	VZEROUPPER_RETURN

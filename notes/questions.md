@@ -1,0 +1,2 @@
+1. How specific should the codeblocks be? E.g., see codeblock 1. Should we parameterise it by registers?
+2. `glibc-impls/short-strlen-avx2.s`, line 144: Why use `subq	$-(VEC_SIZE * 4), %rdi` instead of `addq	$(VEC_SIZE * 4), %rdi`?
