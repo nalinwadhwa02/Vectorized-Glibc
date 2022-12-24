@@ -62,6 +62,7 @@ ENTRY_P2ALIGN (STRCHR, 5)
 	cmpl	$(PAGE_SIZE - VEC_SIZE), %eax
 	ja	L(cross_page_boundary)//![check]: possibility to make another codeblock for checking if crossed page boundary
 
+    // [codeblock]: Check n*VEC_SIZE bytes for a set of chars (arity 1 or 2). Params - either/and.
 	/* Check the first VEC_SIZE bytes.	Search for both CHAR and the
 	   null byte.  */
 	vmovdqu	(%rdi), %ymm2
@@ -164,7 +165,7 @@ L(cross_page_continue):
 	vpor	%ymm3, %ymm2, %ymm3
 	vpmovmskb %ymm3, %eax
 	testl	%eax, %eax
-	jnz	L(first_vec_x1)
+	jnz	L(first_vec_x1) // [codeblock] same as initial.
 
 	vmovdqa	(VEC_SIZE + 1)(%rdi), %ymm2
 	VPCMPEQ	%ymm2, %ymm0, %ymm3
@@ -202,7 +203,7 @@ L(loop_4x_vec):
 	vpxor	%ymm6, %ymm0, %ymm2
 	vpxor	%ymm7, %ymm0, %ymm3
 
-	VPMINU	%ymm2, %ymm6, %ymm2 //![doubt]: why are we using VPMINU (min command), and at other places using or/and
+	VPMINU	%ymm2, %ymm6, %ymm2 // ymm2 has a 0 iff bytes 0-31 have a NULL byte or CHAR byte
 	VPMINU	%ymm3, %ymm7, %ymm3
 
 	vmovdqa	(VEC_SIZE * 2 + 1)(%rdi), %ymm6
@@ -223,7 +224,7 @@ L(loop_4x_vec):
 	vpmovmskb %ymm7, %ecx
 	subq	$-(VEC_SIZE * 4), %rdi
 	testl	%ecx, %ecx
-	jz	L(loop_4x_vec)
+	jz	L(loop_4x_vec) // Slow Path. [codeblock]: Exit into original implementation for checking the next 128 characters one-by-one.
 
 	VPCMPEQ	%ymm2, %ymm1, %ymm2
 	vpmovmskb %ymm2, %eax
