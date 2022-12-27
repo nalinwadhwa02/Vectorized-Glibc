@@ -57,8 +57,8 @@
 #  define PAGE_ALIGN_REG	eax
 # endif
 
-# define VZERO	VMM(7)
-# define VZERO_128	VMM_128(7)
+# define VZERO	VMM(7) // [rns]: ymm7
+# define VZERO_128	VMM_128(7) // [rns]: xmm7 
 
 	.section SECTION(.text), "ax", @progbits
 ENTRY(STRCPY)

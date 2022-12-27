@@ -1,3 +1,17 @@
+# ZERO_LOWER
+
+Params:
+
+- `reg-num`: Number of 256-bit register whose lower 128 bits will be zeroed.
+
+Description: Zero out the lower 128 bits of a `ymm` register.
+
+Code:
+
+```asm
+vpxor %xmm{reg-num} %xmm{reg-num}
+```
+
 # VZEROUPPER_RETURN
 
 - [TODO]: Not sure which return codeblock is most widely used. For now, going with this.
@@ -7,7 +21,7 @@ to avoid RTM abort triggered by VZEROUPPER inside transactionally. Zeroing regis
 
 Code:
 
-```{c}
+```c
 #define ZERO_UPPER_VEC_REGISTERS_RETURN_XTEST \
 	xtest;							\
 	jnz	1f;						\
@@ -29,7 +43,7 @@ Description: Compare 32 bytes at memory location pointed to by `%rloc` with the 
 
 Code:
 
-```{asm}
+```asm
 vpcmpeq (%rloc), %creg, %ymm1
 vpmovmskb %ymm1, %eax
 testl %eax, %eax
@@ -40,7 +54,7 @@ Example Usage:
 
 - `strlen()` main loop. Assume `%ymm0` has all zeroes, `%rdi` has the start location, `VEC_SIZE` is 32.
 
-```{asm}
+```asm
 L(main_loop):
     cmp-mem-reg-32(rloc=rdi, creg=ymm0)
     subq $-(VEC_SIZE), %rdi // [doubt]: not sure why. see question 2.
@@ -57,7 +71,7 @@ Description: Cascadable version of the cmp-mem-reg-32 codeblock
 
 Code: 
 
-```{asm}
+```asm
 vpcmpeq %ymm0, %creg, %ymm1
 vpmovmskb %ymm1, %eax
 orl %eax, %ebx
