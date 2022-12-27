@@ -17,7 +17,7 @@ vpxor %xmm{reg-num} %xmm{reg-num}
 - [TODO]: Not sure which return codeblock is most widely used. For now, going with this.
 
 Description: Zero upper vector registers and return with xtest.  NB: Use VZEROALL
-to avoid RTM abort triggered by VZEROUPPER inside transactionally. Zeroing registers is good for performance (see Section 6.3 of [Agner Fog&#39;s Calling Conventions](https://www.agner.org/optimize/calling_conventions.pdf)).
+to avoid RTM abort triggered by VZEROUPPER inside transactionally. Zeroing registers is good for performance (see Section 6.3 of [Agner Fog's Calling Conventions](https://www.agner.org/optimize/calling_conventions.pdf)).
 
 Code:
 
@@ -61,6 +61,52 @@ L(main_loop):
     jz L(main_loop)
     tzcntl %eax, %eax
     VZEROUPPER_RETURN
+```
+
+# SEARCH_4x
+
+Params:
+
+- `VEC_SIZE`: Number of bytes in a vector register. This is 32 for our purposes.
+- `CHAR_SET`: Characters to match against. This can be of three forms - `{\0}`, `{c}` and `{\0,c}` where `c` is any character.
+- `rloc`: Register containing the location from which to begin search. Eg, `rdi`.
+- `ymm_creg`: In case `CHAR_SET` contains `c`, `creg` is a vector register whose each byte is equal to `c`.
+- `ymm_zreg`: A vector register with all bytes set to zero.
+- `VPMINU`: `vpminub` if normal (8-bit) characters, `vpminud` for wide characters.
+- `VPCMPEQ`: `vpcmpeqb` if normal (8-bit) characters, `vpcmpeqd` for wide characters.
+
+Description: Search the next 4*`VEC_SIZE` bytes for a given set of characters of size <=2. After the end, locations `[%rloc, %rloc + 4*VEC_SIZE)` have a character in `CHAR_SET` iff the `ZF` flag is not set.
+
+Code: (Currently only the case where `CHAR_SET={\0,c}` is covered)
+
+```asm
+vmovdqa	(%rloc), %ymm6
+vmovdqa	VEC_SIZE(%rloc), %ymm7
+
+/* Leaves only CHARS matching esi as 0.	 */
+vpxor	%ymm6, %ymm_creg, %ymm2
+vpxor	%ymm7, %ymm_creg, %ymm3
+
+VPMINU	%ymm2, %ymm6, %ymm2 // ymm2 has a 0 iff bytes 0-31 have a NULL byte or CHAR byte
+VPMINU	%ymm3, %ymm7, %ymm3
+
+vmovdqa	(VEC_SIZE * 2)(%rloc), %ymm6
+vmovdqa	(VEC_SIZE * 3)(%rloc), %ymm7
+
+vpxor	%ymm6, %ymm_creg, %ymm4
+vpxor	%ymm7, %ymm_creg, %ymm5
+
+VPMINU	%ymm4, %ymm6, %ymm4
+VPMINU	%ymm5, %ymm7, %ymm5
+
+VPMINU	%ymm2, %ymm3, %ymm6
+VPMINU	%ymm4, %ymm5, %ymm7
+
+VPMINU	%ymm6, %ymm7, %ymm7
+
+VPCMPEQ	%ymm7, %ymm_zreg %ymm7
+vpmovmskb %ymm7, %ecx
+testl	%ecx, %ecx
 ```
 
 # temp

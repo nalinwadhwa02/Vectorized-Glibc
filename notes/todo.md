@@ -4,3 +4,5 @@
   - cascadable comparision codeblocks
 - Changes in existing code blocks
   - make cmp-mem-reg-32 not specific to arguments (remove first args mem dependency)
+  - in search_4x, use `VPMINU` macro instead of `vpminub` to handle wide characters also.
+  - cover all `CHAR_SET` cases in search_4x
