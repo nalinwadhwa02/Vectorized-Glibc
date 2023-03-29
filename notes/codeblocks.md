@@ -108,7 +108,6 @@ VPCMPEQ	%ymm7, %ymm_zreg %ymm7
 vpmovmskb %ymm7, %ecx
 testl	%ecx, %ecx
 ```
-
 # temp
 
 ### cmp-cascade-mem-reg-32
